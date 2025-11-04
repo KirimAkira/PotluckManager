@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PotluckManager – Setup (Bootstrap MVP)</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background: #f7f7fb;
+      }
+      .sticky-preview {
+        position: sticky;
+        top: 1rem;
+      }
+      .date-pill {
+        border-radius: 1rem;
+        background: #fff;
+        border: 1px solid #e7e7ef;
+        padding: 0.5rem 0.75rem;
+      }
+      .weekday .form-check {
+        margin-right: 0.75rem;
+      }
+      .muted {
+        color: #6c757d;
+      }
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container py-4">
+      <div class="mb-4">
+        <h1 class="h3 fw-semibold">Create a Meal Schedule</h1>
+        <p class="text-muted mb-0">
+          Bootstrap-only MVP inspired by TakeThemAMeal. Fill in details, pick a
+          window and weekdays, and preview the generated dates.
+        </p>
+      </div>
+
+      <form id="setupForm" class="row g-4">
+        <!-- Left: form -->
+        <div class="col-lg-8">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h2 class="h5">Meal Coordinator</h2>
+              <div class="row g-3 mt-1">
+                <div class="col-sm-6">
+                  <label class="form-label">First Name</label>
+                  <input class="form-control" id="coordFirst" required />
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label">Last Name</label>
+                  <input class="form-control" id="coordLast" required />
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label">Email</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="coordEmail"
+                    required
+                  />
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label">Phone (optional)</label>
+                  <input class="form-control" id="coordPhone" />
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label"
+                    >Admin Password
+                    <span class="text-muted small">(min 4 chars)</span></label
+                  >
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="adminPw"
+                    minlength="4"
+                    required
+                  />
+                </div>
+              </div>
+
+              <hr class="my-4" />
+
+              <h2 class="h5">Meal Recipient</h2>
+              <div class="row g-3 mt-1">
+                <div class="col-sm-6">
+                  <label class="form-label">First Name</label>
+                  <input class="form-control" id="recFirst" required />
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label">Last Name</label>
+                  <input class="form-control" id="recLast" required />
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label">Email (optional)</label>
+                  <input type="email" class="form-control" id="recEmail" />
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label">Phone (optional)</label>
+                  <input class="form-control" id="recPhone" />
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label"
+                    >User Password
+                    <span class="text-muted small"
+                      >(for volunteers)</span
+                    ></label
+                  >
+                  <input class="form-control" id="userPw" required />
+                </div>
+              </div>
+
+              <hr class="my-4" />
+
+              <div class="d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Delivery Address</h2>
+                <button class="btn btn-link p-0" type="button" id="toggleIntl">
+                  Switch to International Address
+                </button>
+              </div>
+              <div id="usAddress" class="row g-3 mt-1">
+                <div class="col-12">
+                  <label class="form-label">Address</label>
+                  <input class="form-control" id="addr1" />
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label">City</label>
+                  <input class="form-control" id="city" />
+                </div>
+                <div class="col-sm-3">
+                  <label class="form-label">State</label>
+                  <select class="form-select" id="state"></select>
+                </div>
+                <div class="col-sm-3">
+                  <label class="form-label">ZIP</label>
+                  <input class="form-control" id="zip" />
+                </div>
+              </div>
+              <div id="intlAddress" class="mt-2 d-none">
+                <label class="form-label">International Address</label>
+                <textarea class="form-control" id="intl" rows="3"></textarea>
+              </div>
+
+              <hr class="my-4" />
+
+              <h2 class="h5">When Are Meals Needed?</h2>
+              <div class="row g-3 mt-1">
+                <div class="col-sm-6">
+                  <label class="form-label">Start Meals</label>
+                  <input type="date" class="form-control" id="startDate" />
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label">Stop Meals</label>
+                  <input type="date" class="form-control" id="endDate" />
+                </div>
+              </div>
+              <div class="mt-2 weekday">
+                <label class="form-label">Weekdays</label>
+                <div class="d-flex flex-wrap">
+                  <!-- checkboxes inserted by JS -->
+                </div>
+                <div class="form-text">
+                  Select at least one weekday. You can edit dates later.
+                </div>
+              </div>
+
+              <hr class="my-4" />
+
+              <h2 class="h5">Allergies</h2>
+              <div id="allergies" class="d-flex flex-wrap gap-3">
+                <!-- allergen chips inserted by JS -->
+              </div>
+              <div class="mt-2">
+                <label class="form-label">Other Allergies</label>
+                <input
+                  class="form-control"
+                  id="otherAllergy"
+                  placeholder="e.g., cilantro, pork, spicy foods"
+                />
+              </div>
+
+              <hr class="my-4" />
+
+              <h2 class="h5">Notes and Instructions</h2>
+              <textarea
+                class="form-control"
+                id="notes"
+                rows="4"
+                placeholder="Household size, likes/dislikes, drop-off instructions..."
+              ></textarea>
+
+              <div class="mt-4 d-flex align-items-center gap-3">
+                <button type="submit" class="btn btn-primary">
+                  Create Meal Schedule
+                </button>
+                <div id="errorBox" class="text-danger small"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: preview -->
+        <div class="col-lg-4">
+          <div class="sticky-preview">
+            <div class="card shadow-sm mb-3">
+              <div class="card-body">
+                <h3 class="h6">Live Schedule Preview</h3>
+                <div
+                  id="dateList"
+                  class="mt-2"
+                  style="
+                    max-height: 380px;
+                    overflow: auto;
+                    border: 1px solid #eee;
+                    border-radius: 0.75rem;
+                    padding: 0.5rem;
+                  "
+                ></div>
+              </div>
+            </div>
+
+            <div class="card shadow-sm mb-3">
+              <div class="card-body">
+                <h3 class="h6">Allergy Summary</h3>
+                <ul id="allergySummary" class="small mb-0"></ul>
+              </div>
+            </div>
+
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h3 class="h6">Share Settings</h3>
+                <div class="small">
+                  User Password: <span class="mono" id="userPwPreview"></span>
+                </div>
+                <div class="small">
+                  Admin Password: <span class="mono" id="adminPwPreview"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- App logic (preview/validators/helpers) -->
+    <script>
+      const US_STATES = [
+        "AK",
+        "AL",
+        "AR",
+        "AZ",
+        "CA",
+        "CO",
+        "CT",
+        "DC",
+        "DE",
+        "FL",
+        "GA",
+        "HI",
+        "IA",
+        "ID",
+        "IL",
+        "IN",
+        "KS",
+        "KY",
+        "LA",
+        "MA",
+        "MD",
+        "ME",
+        "MI",
+        "MN",
+        "MO",
+        "MS",
+        "MT",
+        "NC",
+        "ND",
+        "NE",
+        "NH",
+        "NJ",
+        "NM",
+        "NV",
+        "NY",
+        "OH",
+        "OK",
+        "OR",
+        "PA",
+        "RI",
+        "SC",
+        "SD",
+        "TN",
+        "TX",
+        "UT",
+        "VA",
+        "VT",
+        "WA",
+        "WI",
+        "WV",
+        "WY",
+        "AA",
+        "AE",
+        "AP",
+        "AS",
+        "FM",
+        "GU",
+        "MH",
+        "MP",
+        "PR",
+        "PW",
+        "VI",
+      ];
+      const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      const ALLERGENS = [
+        "Eggs",
+        "Fish",
+        "Dairy",
+        "Tree Nuts",
+        "Peanuts",
+        "Shellfish",
+        "Soy",
+        "Gluten",
+      ];
+
+      function fmtDate(date) {
+        return new Intl.DateTimeFormat("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }).format(date);
+      }
+      function toISO(d) {
+        return d.toISOString().slice(0, 10);
+      }
+      function addMonths(date, months) {
+        const d = new Date(date);
+        d.setMonth(d.getMonth() + months);
+        return d;
+      }
+
+      function generateDates(startStr, endStr, enabled) {
+        if (!startStr || !endStr) return [];
+        const start = new Date(startStr + "T00:00:00");
+        const end = new Date(endStr + "T00:00:00");
+        if (end < start) return [];
+        const set = new Set(enabled);
+        const out = [];
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          const label = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
+            d.getDay()
+          ];
+          if (set.has(label)) out.push(new Date(d));
+        }
+        return out;
+      }
+
+      // init selects/checkboxes
+      const stateSel = document.getElementById("state");
+      US_STATES.forEach((s) => {
+        const o = document.createElement("option");
+        o.value = o.textContent = s;
+        stateSel.appendChild(o);
+      });
+      stateSel.value = "AZ";
+
+      const weekdayWrap = document.querySelector(".weekday .d-flex");
+      WEEKDAYS.forEach((w) => {
+        const id = `wd_${w}`;
+        const div = document.createElement("div");
+        div.className = "form-check form-check-inline";
+        div.innerHTML = `<input class="form-check-input" type="checkbox" id="${id}" checked> <label class="form-check-label" for="${id}">${w}</label>`;
+        weekdayWrap.appendChild(div);
+      });
+
+      const allergiesDiv = document.getElementById("allergies");
+      ALLERGENS.forEach((a) => {
+        const id = `alg_${a.replace(/\s+/g, "")}`;
+        const label = document.createElement("label");
+        label.className = "form-check form-check-inline";
+        label.innerHTML = `<input class="form-check-input" type="checkbox" id="${id}"> <span class="form-check-label">${a}</span>`;
+        allergiesDiv.appendChild(label);
+      });
+
+      const startDate = document.getElementById("startDate");
+      const endDate = document.getElementById("endDate");
+      const today = new Date();
+      startDate.value = toISO(today);
+      endDate.value = toISO(addMonths(today, 2));
+
+      // intl toggle
+      let usingIntl = false;
+      const toggleBtn = document.getElementById("toggleIntl");
+      const usAddress = document.getElementById("usAddress");
+      const intlAddress = document.getElementById("intlAddress");
+      toggleBtn.addEventListener("click", () => {
+        usingIntl = !usingIntl;
+        toggleBtn.textContent = usingIntl
+          ? "Switch to U.S. Address"
+          : "Switch to International Address";
+        usAddress.classList.toggle("d-none", usingIntl);
+        intlAddress.classList.toggle("d-none", !usingIntl);
+      });
+
+      // preview
+      const dateList = document.getElementById("dateList");
+      const allergySummary = document.getElementById("allergySummary");
+      const userPwPreview = document.getElementById("userPwPreview");
+      const adminPwPreview = document.getElementById("adminPwPreview");
+      const userPwInput = document.getElementById("userPw");
+      const adminPwInput = document.getElementById("adminPw");
+
+      function refreshPreview() {
+        const enabled = WEEKDAYS.filter(
+          (w) => document.getElementById(`wd_${w}`).checked
+        );
+        const list = generateDates(startDate.value, endDate.value, enabled);
+        dateList.innerHTML = "";
+        if (list.length === 0) {
+          dateList.innerHTML =
+            '<div class="text-muted small p-2">Select weekdays to generate dates.</div>';
+        } else {
+          list.forEach((d) => {
+            const item = document.createElement("div");
+            item.className =
+              "d-flex justify-content-between align-items-center date-pill mb-2";
+            item.innerHTML = `<span>${fmtDate(
+              d
+            )}</span><span class="muted">Open</span>`;
+            dateList.appendChild(item);
+          });
+        }
+        const items = [];
+        ALLERGENS.forEach((a) => {
+          const id = `alg_${a.replace(/\s+/g, "")}`;
+          if (document.getElementById(id).checked) items.push(a);
+        });
+        const other = document.getElementById("otherAllergy").value.trim();
+        allergySummary.innerHTML = "";
+        if (items.length === 0 && !other) {
+          allergySummary.innerHTML =
+            '<li class="text-muted">No allergies listed</li>';
+        }
+        items.forEach((t) => {
+          const li = document.createElement("li");
+          li.textContent = t;
+          allergySummary.appendChild(li);
+        });
+        if (other) {
+          const li = document.createElement("li");
+          li.textContent = "Other: " + other;
+          allergySummary.appendChild(li);
+        }
+
+        userPwPreview.textContent = userPwInput.value || "(set above)";
+        adminPwPreview.textContent = adminPwInput.value || "(set above)";
+      }
+
+      document.addEventListener("input", (e) => {
+        if (
+          e.target.closest(".weekday") ||
+          e.target.id === "startDate" ||
+          e.target.id === "endDate" ||
+          e.target.id === "otherAllergy" ||
+          (e.target.id || "").startsWith("alg_") ||
+          e.target.id === "userPw" ||
+          e.target.id === "adminPw"
+        ) {
+          refreshPreview();
+        }
+      });
+      refreshPreview();
+    </script>
+
+    <!-- ✅ SUBMIT + Supabase 연결 -->
+    <script>
+      // 1) 제출 핸들러 (async)
+      const form = document.getElementById("setupForm");
+      const errorBox = document.getElementById("errorBox");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errorBox.textContent = "";
+
+        // === Validation ===
+        const errors = [];
+        const req = (id, label) => {
+          if (!document.getElementById(id).value.trim())
+            errors.push(`${label} is required.`);
+        };
+        req("coordFirst", "Coordinator first name");
+        req("coordLast", "Coordinator last name");
+        req("coordEmail", "Coordinator email");
+        if (document.getElementById("adminPw").value.trim().length < 4)
+          errors.push("Admin password must be at least 4 characters.");
+        req("recFirst", "Recipient first name");
+        req("recLast", "Recipient last name");
+        req("userPw", "User password");
+
+        const enabled = WEEKDAYS.filter(
+          (w) => document.getElementById(`wd_${w}`).checked
+        );
+        const dateListArr = generateDates(
+          startDate.value,
+          endDate.value,
+          enabled
+        );
+        if (dateListArr.length === 0)
+          errors.push("Select at least one weekday and a valid date range.");
+
+        if (!usingIntl) {
+          req("addr1", "Address");
+          req("city", "City");
+          req("state", "State");
+          req("zip", "ZIP");
+        } else {
+          req("intl", "International address");
+        }
+
+        if (errors.length) {
+          errorBox.textContent = errors.join(" ");
+          return;
+        }
+
+        // === Payload ===
+        const payload = {
+          coordinator: {
+            first: document.getElementById("coordFirst").value.trim(),
+            last: document.getElementById("coordLast").value.trim(),
+            email: document.getElementById("coordEmail").value.trim(),
+            phone: document.getElementById("coordPhone").value.trim(),
+            adminPw: document.getElementById("adminPw").value,
+          },
+          recipient: {
+            first: document.getElementById("recFirst").value.trim(),
+            last: document.getElementById("recLast").value.trim(),
+            email: document.getElementById("recEmail").value.trim(),
+            phone: document.getElementById("recPhone").value.trim(),
+            userPw: document.getElementById("userPw").value,
+          },
+          address: !usingIntl
+            ? {
+                address: document.getElementById("addr1").value.trim(),
+                city: document.getElementById("city").value.trim(),
+                state: document.getElementById("state").value,
+                zip: document.getElementById("zip").value.trim(),
+              }
+            : { international: document.getElementById("intl").value.trim() },
+          window: {
+            start: document.getElementById("startDate").value,
+            end: document.getElementById("endDate").value,
+          },
+          weekdays: enabled,
+          allergies: (() => {
+            const map = {};
+            ALLERGENS.forEach((a) => {
+              const id = `alg_${a.replace(/\s+/g, "")}`;
+              if (document.getElementById(id).checked) map[a] = true;
+            });
+            const other = document.getElementById("otherAllergy").value.trim();
+            if (other) map.other = other;
+            return map;
+          })(),
+          notes: document.getElementById("notes").value,
+          schedule: dateListArr.map((d) => d.toISOString().slice(0, 10)),
+        };
+
+        console.log("Meal Schedule Payload:", payload);
+
+        try {
+          const slug = await saveToSupabase(payload);
+          alert(
+            `✅ saved successfully!\nCheck your Supabase Table to confirm.`
+          );
+        } catch (err) {
+          console.error(err);
+          alert("❌ failed to save! check the error in Console.");
+        }
+      });
+
+      // 2) Supabase 접속 정보 (직선 따옴표만!)
+      const SUPABASE_URL = "https://hhuuwodljfgfhpwzbunt.supabase.co";
+      const SUPABASE_ANON =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhodXV3b2RsamZnZmhwd3pidW50Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIxOTk0NjksImV4cCI6MjA3Nzc3NTQ2OX0.noNq4GxCuP3Bf0zAeMk9_D5wj4j8TsMLZHUEf5v8XNY";
+
+      // 3) 저장 함수
+      function makeSlug() {
+        return (
+          new Date().toISOString().slice(0, 10).replaceAll("-", "") +
+          "-" +
+          Math.random().toString(36).slice(2, 7)
+        );
+      }
+
+      async function saveToSupabase(payload) {
+        const slug = makeSlug();
+        const body = {
+          slug,
+          coordinator_first: payload.coordinator.first,
+          coordinator_last: payload.coordinator.last,
+          coordinator_email: payload.coordinator.email,
+          recipient_first: payload.recipient.first,
+          recipient_last: payload.recipient.last,
+          address_json: payload.address,
+          window_start: payload.window.start,
+          window_end: payload.window.end,
+          weekdays: payload.weekdays,
+          notes: payload.notes,
+          allergies: payload.allergies,
+          user_pw_hash: payload.recipient.userPw, // 데모 단계: 평문 (후에 해시)
+          admin_pw_hash: payload.coordinator.adminPw,
+        };
+
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/schedules`, {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_ANON,
+            Authorization: `Bearer ${SUPABASE_ANON}`,
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+          const t = await res.text();
+          throw new Error(`Supabase insert failed: ${res.status} ${t}`);
+        }
+        const [row] = await res.json();
+        return row.slug;
+      }
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
