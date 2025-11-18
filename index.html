@@ -15,6 +15,13 @@
       body {
         background: #f7f7fb;
       }
+      .navbar-brand {
+        font-weight: 700;
+      }
+      .page-subtitle {
+        max-width: 720px;
+        margin: 0 auto;
+      }
       .sticky-preview {
         position: sticky;
         top: 1rem;
@@ -35,173 +42,216 @@
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
           "Liberation Mono", "Courier New", monospace;
       }
+      .section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        border-bottom: 1px solid #e5e5f0;
+        padding-bottom: 0.35rem;
+        margin-bottom: 0.75rem;
+      }
+      .card-main {
+        border-radius: 1.25rem;
+        border: 0;
+      }
+      .card-side {
+        border-radius: 1rem;
+        border: 0;
+      }
+      .form-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
     </style>
   </head>
   <body>
-    <div class="container py-4">
-      <div class="mb-4">
-        <h1 class="h3 fw-semibold">Create a Meal Schedule</h1>
-        <p class="text-muted mb-0">
+    <!-- 상단 네비게이션 / 헤더 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          PotluckManager
+        </a>
+        <span class="navbar-text text-muted small">
+          Simple community meal scheduling (Bootstrap + Supabase)
+        </span>
+      </div>
+    </nav>
+
+    <div class="container py-4 py-md-5">
+      <!-- 페이지 타이틀 -->
+      <div class="mb-4 text-center">
+        <h1 class="h3 fw-semibold mb-1">Create a Meal Schedule</h1>
+        <p class="text-muted mb-0 page-subtitle">
           Bootstrap-only MVP inspired by TakeThemAMeal. Fill in details, pick a
-          window and weekdays, and preview the generated dates.
+          date window and weekdays, and preview the generated schedule before
+          saving to Supabase.
         </p>
       </div>
 
-      <form id="setupForm" class="row g-4">
+      <form id="setupForm" class="row g-4 g-lg-5">
         <!-- Left: form -->
         <div class="col-lg-8">
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <h2 class="h5">Meal Coordinator</h2>
-              <div class="row g-3 mt-1">
-                <div class="col-sm-6">
-                  <label class="form-label">First Name</label>
-                  <input class="form-control" id="coordFirst" required />
+          <div class="card shadow-sm card-main">
+            <div class="card-body p-4 p-md-4">
+
+              <!-- Meal Coordinator -->
+              <div class="mb-4">
+                <h2 class="section-title">Meal Coordinator</h2>
+                <div class="row g-3 mt-1">
+                  <div class="col-sm-6">
+                    <label class="form-label">First Name</label>
+                    <input class="form-control form-control-sm" id="coordFirst" required />
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label">Last Name</label>
+                    <input class="form-control form-control-sm" id="coordLast" required />
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label">Email</label>
+                    <input
+                      type="email"
+                      class="form-control form-control-sm"
+                      id="coordEmail"
+                      required
+                    />
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label">Phone (optional)</label>
+                    <input class="form-control form-control-sm" id="coordPhone" />
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label"
+                      >Admin Password
+                      <span class="text-muted small">(min 4 chars)</span></label
+                    >
+                    <input
+                      type="password"
+                      class="form-control form-control-sm"
+                      id="adminPw"
+                      minlength="4"
+                      required
+                    />
+                  </div>
                 </div>
-                <div class="col-sm-6">
-                  <label class="form-label">Last Name</label>
-                  <input class="form-control" id="coordLast" required />
+              </div>
+
+              <!-- Recipient -->
+              <div class="mb-4">
+                <h2 class="section-title">Meal Recipient</h2>
+                <div class="row g-3 mt-1">
+                  <div class="col-sm-6">
+                    <label class="form-label">First Name</label>
+                    <input class="form-control form-control-sm" id="recFirst" required />
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label">Last Name</label>
+                    <input class="form-control form-control-sm" id="recLast" required />
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label">Email (optional)</label>
+                    <input type="email" class="form-control form-control-sm" id="recEmail" />
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label">Phone (optional)</label>
+                    <input class="form-control form-control-sm" id="recPhone" />
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label"
+                      >User Password
+                      <span class="text-muted small"
+                        >(for volunteers)</span
+                      ></label
+                    >
+                    <input class="form-control form-control-sm" id="userPw" required />
+                  </div>
                 </div>
-                <div class="col-sm-6">
-                  <label class="form-label">Email</label>
+              </div>
+
+              <!-- Address -->
+              <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h2 class="section-title mb-0">Delivery Address</h2>
+                  <button class="btn btn-link p-0 small" type="button" id="toggleIntl">
+                    Switch to International Address
+                  </button>
+                </div>
+                <div id="usAddress" class="row g-3 mt-1">
+                  <div class="col-12">
+                    <label class="form-label">Address</label>
+                    <input class="form-control form-control-sm" id="addr1" />
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label">City</label>
+                    <input class="form-control form-control-sm" id="city" />
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="form-label">State</label>
+                    <select class="form-select form-select-sm" id="state"></select>
+                  </div>
+                  <div class="col-sm-3">
+                    <label class="form-label">ZIP</label>
+                    <input class="form-control form-control-sm" id="zip" />
+                  </div>
+                </div>
+                <div id="intlAddress" class="mt-2 d-none">
+                  <label class="form-label">International Address</label>
+                  <textarea class="form-control form-control-sm" id="intl" rows="3"></textarea>
+                </div>
+              </div>
+
+              <!-- Date window -->
+              <div class="mb-4">
+                <h2 class="section-title">When Are Meals Needed?</h2>
+                <div class="row g-3 mt-1">
+                  <div class="col-sm-6">
+                    <label class="form-label">Start Meals</label>
+                    <input type="date" class="form-control form-control-sm" id="startDate" />
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label">Stop Meals</label>
+                    <input type="date" class="form-control form-control-sm" id="endDate" />
+                  </div>
+                </div>
+                <div class="mt-2 weekday">
+                  <label class="form-label">Weekdays</label>
+                  <div class="d-flex flex-wrap">
+                    <!-- checkboxes inserted by JS -->
+                  </div>
+                  <div class="form-text">
+                    Select at least one weekday. You can edit dates later.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Allergies -->
+              <div class="mb-4">
+                <h2 class="section-title">Allergies</h2>
+                <div id="allergies" class="d-flex flex-wrap gap-3 mb-2">
+                  <!-- allergen chips inserted by JS -->
+                </div>
+                <div class="mt-2">
+                  <label class="form-label">Other Allergies</label>
                   <input
-                    type="email"
-                    class="form-control"
-                    id="coordEmail"
-                    required
+                    class="form-control form-control-sm"
+                    id="otherAllergy"
+                    placeholder="e.g., cilantro, pork, spicy foods"
                   />
                 </div>
-                <div class="col-sm-6">
-                  <label class="form-label">Phone (optional)</label>
-                  <input class="form-control" id="coordPhone" />
-                </div>
-                <div class="col-sm-6">
-                  <label class="form-label"
-                    >Admin Password
-                    <span class="text-muted small">(min 4 chars)</span></label
-                  >
-                  <input
-                    type="password"
-                    class="form-control"
-                    id="adminPw"
-                    minlength="4"
-                    required
-                  />
-                </div>
               </div>
 
-              <hr class="my-4" />
-
-              <h2 class="h5">Meal Recipient</h2>
-              <div class="row g-3 mt-1">
-                <div class="col-sm-6">
-                  <label class="form-label">First Name</label>
-                  <input class="form-control" id="recFirst" required />
-                </div>
-                <div class="col-sm-6">
-                  <label class="form-label">Last Name</label>
-                  <input class="form-control" id="recLast" required />
-                </div>
-                <div class="col-sm-6">
-                  <label class="form-label">Email (optional)</label>
-                  <input type="email" class="form-control" id="recEmail" />
-                </div>
-                <div class="col-sm-6">
-                  <label class="form-label">Phone (optional)</label>
-                  <input class="form-control" id="recPhone" />
-                </div>
-                <div class="col-sm-6">
-                  <label class="form-label"
-                    >User Password
-                    <span class="text-muted small"
-                      >(for volunteers)</span
-                    ></label
-                  >
-                  <input class="form-control" id="userPw" required />
-                </div>
+              <!-- Notes -->
+              <div class="mb-3">
+                <h2 class="section-title">Notes and Instructions</h2>
+                <textarea
+                  class="form-control form-control-sm"
+                  id="notes"
+                  rows="4"
+                  placeholder="Household size, likes/dislikes, drop-off instructions..."
+                ></textarea>
               </div>
 
-              <hr class="my-4" />
-
-              <div class="d-flex justify-content-between align-items-center">
-                <h2 class="h5 mb-0">Delivery Address</h2>
-                <button class="btn btn-link p-0" type="button" id="toggleIntl">
-                  Switch to International Address
-                </button>
-              </div>
-              <div id="usAddress" class="row g-3 mt-1">
-                <div class="col-12">
-                  <label class="form-label">Address</label>
-                  <input class="form-control" id="addr1" />
-                </div>
-                <div class="col-sm-6">
-                  <label class="form-label">City</label>
-                  <input class="form-control" id="city" />
-                </div>
-                <div class="col-sm-3">
-                  <label class="form-label">State</label>
-                  <select class="form-select" id="state"></select>
-                </div>
-                <div class="col-sm-3">
-                  <label class="form-label">ZIP</label>
-                  <input class="form-control" id="zip" />
-                </div>
-              </div>
-              <div id="intlAddress" class="mt-2 d-none">
-                <label class="form-label">International Address</label>
-                <textarea class="form-control" id="intl" rows="3"></textarea>
-              </div>
-
-              <hr class="my-4" />
-
-              <h2 class="h5">When Are Meals Needed?</h2>
-              <div class="row g-3 mt-1">
-                <div class="col-sm-6">
-                  <label class="form-label">Start Meals</label>
-                  <input type="date" class="form-control" id="startDate" />
-                </div>
-                <div class="col-sm-6">
-                  <label class="form-label">Stop Meals</label>
-                  <input type="date" class="form-control" id="endDate" />
-                </div>
-              </div>
-              <div class="mt-2 weekday">
-                <label class="form-label">Weekdays</label>
-                <div class="d-flex flex-wrap">
-                  <!-- checkboxes inserted by JS -->
-                </div>
-                <div class="form-text">
-                  Select at least one weekday. You can edit dates later.
-                </div>
-              </div>
-
-              <hr class="my-4" />
-
-              <h2 class="h5">Allergies</h2>
-              <div id="allergies" class="d-flex flex-wrap gap-3">
-                <!-- allergen chips inserted by JS -->
-              </div>
-              <div class="mt-2">
-                <label class="form-label">Other Allergies</label>
-                <input
-                  class="form-control"
-                  id="otherAllergy"
-                  placeholder="e.g., cilantro, pork, spicy foods"
-                />
-              </div>
-
-              <hr class="my-4" />
-
-              <h2 class="h5">Notes and Instructions</h2>
-              <textarea
-                class="form-control"
-                id="notes"
-                rows="4"
-                placeholder="Household size, likes/dislikes, drop-off instructions..."
-              ></textarea>
-
+              <!-- Submit -->
               <div class="mt-4 d-flex align-items-center gap-3">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-success px-4">
                   Create Meal Schedule
                 </button>
                 <div id="errorBox" class="text-danger small"></div>
@@ -213,9 +263,9 @@
         <!-- Right: preview -->
         <div class="col-lg-4">
           <div class="sticky-preview">
-            <div class="card shadow-sm mb-3">
+            <div class="card shadow-sm card-side mb-3">
               <div class="card-body">
-                <h3 class="h6">Live Schedule Preview</h3>
+                <h3 class="h6 mb-2">Live Schedule Preview</h3>
                 <div
                   id="dateList"
                   class="mt-2"
@@ -225,26 +275,29 @@
                     border: 1px solid #eee;
                     border-radius: 0.75rem;
                     padding: 0.5rem;
+                    background: #fafafe;
                   "
                 ></div>
               </div>
             </div>
 
-            <div class="card shadow-sm mb-3">
+            <div class="card shadow-sm card-side mb-3">
               <div class="card-body">
-                <h3 class="h6">Allergy Summary</h3>
+                <h3 class="h6 mb-2">Allergy Summary</h3>
                 <ul id="allergySummary" class="small mb-0"></ul>
               </div>
             </div>
 
-            <div class="card shadow-sm">
+            <div class="card shadow-sm card-side">
               <div class="card-body">
-                <h3 class="h6">Share Settings</h3>
-                <div class="small">
-                  User Password: <span class="mono" id="userPwPreview"></span>
+                <h3 class="h6 mb-2">Share Settings</h3>
+                <div class="small mb-1">
+                  User Password:
+                  <span class="mono" id="userPwPreview"></span>
                 </div>
                 <div class="small">
-                  Admin Password: <span class="mono" id="adminPwPreview"></span>
+                  Admin Password:
+                  <span class="mono" id="adminPwPreview"></span>
                 </div>
               </div>
             </div>
@@ -256,68 +309,13 @@
     <!-- App logic (preview/validators/helpers) -->
     <script>
       const US_STATES = [
-        "AK",
-        "AL",
-        "AR",
-        "AZ",
-        "CA",
-        "CO",
-        "CT",
-        "DC",
-        "DE",
-        "FL",
-        "GA",
-        "HI",
-        "IA",
-        "ID",
-        "IL",
-        "IN",
-        "KS",
-        "KY",
-        "LA",
-        "MA",
-        "MD",
-        "ME",
-        "MI",
-        "MN",
-        "MO",
-        "MS",
-        "MT",
-        "NC",
-        "ND",
-        "NE",
-        "NH",
-        "NJ",
-        "NM",
-        "NV",
-        "NY",
-        "OH",
-        "OK",
-        "OR",
-        "PA",
-        "RI",
-        "SC",
-        "SD",
-        "TN",
-        "TX",
-        "UT",
-        "VA",
-        "VT",
-        "WA",
-        "WI",
-        "WV",
-        "WY",
-        "AA",
-        "AE",
-        "AP",
-        "AS",
-        "FM",
-        "GU",
-        "MH",
-        "MP",
-        "PR",
-        "PW",
-        "VI",
+        "AK","AL","AR","AZ","CA","CO","CT","DC","DE","FL",
+        "GA","HI","IA","ID","IL","IN","KS","KY","LA","MA",
+        "MD","ME","MI","MN","MO","MS","MT","NC","ND","NE",
+        "NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI",
+        "SC","SD","TN","TX","UT","VA","VT","WA","WI","WV",
+        "WY","AA","AE","AP","AS","FM","GU","MH","MP","PR",
+        "PW","VI"
       ];
       const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
       const ALLERGENS = [
@@ -356,9 +354,7 @@
         const set = new Set(enabled);
         const out = [];
         for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-          const label = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
-            d.getDay()
-          ];
+          const label = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()];
           if (set.has(label)) out.push(new Date(d));
         }
         return out;
@@ -644,3 +640,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
+
